@@ -1,5 +1,6 @@
 import React from 'react';
 import { Chip } from '@material-ui/core';
+import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 
 import { ITableColumn } from 'types/pages/metrics/components/TableColumns/TableColumns';
 import {
@@ -7,14 +8,11 @@ import {
   AggregationLineMethods,
 } from 'utils/aggregateGroupData';
 
-function getTableColumns(
-  paramColumns: string[] = [],
-  groupFields?: { [key: string]: string } | null,
-  aggregationMethods?: {
-    area: AggregationAreaMethods;
-    line: AggregationLineMethods;
-  },
-): ITableColumn[] {
+function getTableColumns({
+  paramColumns,
+  groupFields,
+  aggregationMethods,
+}: any): ITableColumn[] {
   const columns = [
     {
       dataKey: 'experiment',
@@ -91,8 +89,21 @@ function getTableColumns(
       minWidth: 90,
       resizable: true,
     },
+    {
+      dataKey: 'actions',
+      key: 'actions',
+      title: '',
+      width: 50,
+      frozen: 'right',
+      align: 'center',
+      cellRenderer: function ActionCell({ rowData }: any) {
+        return rowData.groupHeader ? null : (
+          <VisibilityOutlinedIcon color='primary' fontSize='small' />
+        );
+      },
+    },
   ].concat(
-    paramColumns.map((param) => ({
+    paramColumns.map((param: string) => ({
       dataKey: param,
       key: param,
       title: param,

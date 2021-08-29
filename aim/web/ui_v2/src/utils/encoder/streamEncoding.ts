@@ -116,16 +116,21 @@ function decodeValue(buffer: Uint8Array): any {
 }
 
 function decode_q_le(...x: number[]) {
-  return (
-    x[7] * Math.pow(2, 56) +
-    x[6] * Math.pow(2, 48) +
-    x[5] * Math.pow(2, 40) +
-    x[4] * Math.pow(2, 32) +
-    x[3] * (1 << 24) +
-    x[2] * (1 << 16) +
-    x[1] * (1 << 8) +
-    x[0] * (1 << 0)
-  );
+  let h = x[7];
+  let l = x[6];
+  if ((h == 0 && l >> 5 == 0) || (h == 0xff && l >> 5 == 0xff >> 5)) {
+    return (
+      x[7] * Math.pow(2, 56) +
+      x[6] * Math.pow(2, 48) +
+      x[5] * Math.pow(2, 40) +
+      x[4] * Math.pow(2, 32) +
+      x[3] * (1 << 24) +
+      x[2] * (1 << 16) +
+      x[1] * (1 << 8) +
+      x[0] * (1 << 0)
+    );
+  }
+  // new Long()
 }
 
 function decode_q_be(...x: number[]) {

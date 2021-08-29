@@ -64,7 +64,7 @@ import { ISelectMetricsOption } from 'types/pages/metrics/components/SelectForm/
 const model = createModel<Partial<IMetricAppModelState>>({});
 let tooltipData: ITooltipData = {};
 
-function getConfig() {
+function getConfig(): IMetricAppConfig {
   return {
     grouping: {
       color: [],
@@ -128,6 +128,7 @@ function getConfig() {
     },
     table: {
       rowHeight: RowHeight.md,
+      hiddenMetrics: [],
     },
   };
 }
@@ -269,7 +270,10 @@ function getMetricsData() {
           lineChartData: getDataAsLines(data),
           aggregatedData: getAggregatedData(data),
           tableData: getDataAsTableRows(data, null, params),
-          tableColumns: getTableColumns(params, data[0].config),
+          tableColumns: getTableColumns({
+            paramColumns: params,
+            groupFields: data[0].config,
+          }),
         });
       }
     },
@@ -687,7 +691,7 @@ function getAggregatedData(
 
 function getDataAsLines(
   processedData: IMetricsCollection<IMetric>[],
-  configData: IMetricAppConfig | any = model.getState()?.config,
+  configData: IMetricAppConfig = model.getState()?.config!,
 ): ILine[][] {
   if (!processedData) {
     return [];
@@ -695,29 +699,34 @@ function getDataAsLines(
   const { smoothingAlgorithm, smoothingFactor } = configData?.chart;
   const lines = processedData
     .map((metricsCollection: IMetricsCollection<IMetric>) =>
-      metricsCollection.data.map((metric: IMetric) => {
-        let yValues;
-        if (smoothingAlgorithm && smoothingFactor) {
-          yValues = getSmoothenedData({
-            smoothingAlgorithm,
-            smoothingFactor,
-            data: metric.data.yValues,
-          });
-        } else {
-          yValues = metric.data.yValues;
-        }
-        return {
-          ...metric,
-          color: metricsCollection.color ?? metric.color,
-          dasharray: metricsCollection.dasharray ?? metric.color,
-          chartIndex: metricsCollection.chartIndex,
-          selectors: [metric.key, metric.key, metric.run.params.status.hash],
-          data: {
-            xValues: metric.data.xValues,
-            yValues,
-          },
-        };
-      }),
+      metricsCollection.data
+        .filter(
+          (metric: IMetric) =>
+            !configData.table.hiddenMetrics.includes(metric.key),
+        )
+        .map((metric: IMetric) => {
+          let yValues;
+          if (smoothingAlgorithm && smoothingFactor) {
+            yValues = getSmoothenedData({
+              smoothingAlgorithm,
+              smoothingFactor,
+              data: metric.data.yValues,
+            });
+          } else {
+            yValues = metric.data.yValues;
+          }
+          return {
+            ...metric,
+            color: metricsCollection.color ?? metric.color,
+            dasharray: metricsCollection.dasharray ?? metric.color,
+            chartIndex: metricsCollection.chartIndex,
+            selectors: [metric.key, metric.key, metric.run.params.status.hash],
+            data: {
+              xValues: metric.data.xValues,
+              yValues,
+            },
+          };
+        }),
     )
     .flat();
 
@@ -1056,10 +1065,10 @@ function updateModelData(configData: IMetricAppConfig): void {
     null,
     processedData.params,
   );
-  const tableColumns = getTableColumns(
-    processedData.params,
-    processedData.data[0].config,
-  );
+  const tableColumns = getTableColumns({
+    paramColumns: processedData.params,
+    groupFields: processedData.data[0].config,
+  });
   const tableRef: any = model.getState()?.refs?.tableRef;
   tableRef.current?.updateData({
     newData: tableData,
@@ -1303,6 +1312,58 @@ function toggleSelectAdvancedMode() {
   }
 }
 
+function toggleMetricVisibility(metricKey: string) {
+  const configData: IMetricAppConfig | undefined = model.getState()?.config;
+  if (configData?.table) {
+    model.setState({
+      config: {
+        ...configData,
+        table: {
+          ...configData.table,
+          hiddenMetrics: configData.table.hiddenMetrics.includes(metricKey)
+            ? configData.table.hiddenMetrics.filter(
+                (item) => item !== metricKey,
+              )
+            : configData.table.hiddenMetrics.concat([metricKey]),
+        },
+      },
+    });
+  }
+}
+
+function showAllMetrics() {
+  const configData: IMetricAppConfig | undefined = model.getState()?.config;
+  if (configData?.table) {
+    model.setState({
+      config: {
+        ...configData,
+        table: {
+          ...configData.table,
+          hiddenMetrics: [],
+        },
+      },
+    });
+  }
+}
+
+function hideAllMetrics() {
+  const configData: IMetricAppConfig | undefined = model.getState()?.config;
+  const data = model.getState()?.data;
+
+  if (data && configData?.table) {
+    const hiddenMetrics = data.map((metric) => metric.key!);
+    model.setState({
+      config: {
+        ...configData,
+        table: {
+          ...configData.table,
+          hiddenMetrics,
+        },
+      },
+    });
+  }
+}
+
 const metricAppModel = {
   ...model,
   initialize,
@@ -1340,6 +1401,8 @@ const metricAppModel = {
   onSelectAdvancedQueryChange,
   toggleSelectAdvancedMode,
   updateSelectStateUrl,
+  showAllMetrics,
+  hideAllMetrics,
 };
 
 export default metricAppModel;

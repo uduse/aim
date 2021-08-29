@@ -129,6 +129,7 @@ interface IMetricAppConfig {
   };
   table: {
     rowHeight: RowHeight;
+    hiddenMetrics: string[];
   };
 }
 
