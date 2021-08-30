@@ -32,7 +32,6 @@ export interface IMetricAppModelState {
   tableColumns: ITableColumn[];
   params: string[];
   notifyData: INotification[];
-  tooltipContent: ITooltipContent;
 }
 
 export interface IAggregatedData extends IAggregationData {
@@ -107,7 +106,7 @@ interface IMetricAppConfig {
       style: number;
     };
     paletteIndex: number;
-    selectOptions: GroupingSelectOptionType[];
+    selectOptions: IGroupingSelectOption[];
   };
   chart: {
     highlightMode: HighlightEnum;
@@ -120,6 +119,7 @@ interface IMetricAppConfig {
     focusedState: IFocusedState;
     aggregationConfig: IAggregationConfig;
     alignmentConfig: IAlignmentConfig;
+    tooltip: IChartTooltip;
   };
   select: {
     metrics: ISelectMetricsOption[];
@@ -131,6 +131,12 @@ interface IMetricAppConfig {
     rowHeight: RowHeight;
     hiddenMetrics: string[];
   };
+}
+
+export interface IChartTooltip {
+  content: ITooltipContent;
+  display: boolean;
+  selectedParams: string[];
 }
 
 export interface IAlignmentConfig {
@@ -196,11 +202,11 @@ export interface IGetGroupingPersistIndex {
 }
 
 export type GroupNameType = 'color' | 'style' | 'chart';
-export type GroupingSelectOptionType = {
+export interface IGroupingSelectOption {
   label: string;
   group: string;
   value: string;
-};
+}
 
 export interface IAppData extends Partial<IMetricAppConfig | IParamsAppConfig> {
   created_at?: string;
