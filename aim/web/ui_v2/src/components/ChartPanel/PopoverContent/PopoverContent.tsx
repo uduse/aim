@@ -15,6 +15,7 @@ import formatXAxisValueByAlignment from 'utils/formatXAxisValueByAlignment';
 import { ChartTypeEnum } from 'utils/d3';
 import { PathEnum } from 'config/enums/routesEnum';
 import Icon from 'components/Icon/Icon';
+import RunTags from 'components/RunTags/RunTags';
 
 import { IPopoverContentProps } from 'types/components/ChartPanel/PopoverContent';
 
@@ -122,6 +123,7 @@ function PopoverContent({
             </Box>
           </Box>
         ) : null}
+        <RunTags />
       </Box>
     </Paper>
   );
