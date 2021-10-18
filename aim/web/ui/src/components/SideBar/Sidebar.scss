@@ -1,12 +1,15 @@
 @use 'src/styles/abstracts' as *;
 
 .Sidebar__container {
-  width: 75px;
-  max-width: 75px;
+  width: $sidebar-width;
+  max-width: $sidebar-width;
 }
 
 .Sidebar__Paper {
+  width: $sidebar-width;
+  max-width: $sidebar-width;
   background-color: #09003f !important;
+  border-right: unset !important;
 }
 
 .Sidebar__List {

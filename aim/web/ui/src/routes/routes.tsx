@@ -11,6 +11,8 @@ const Bookmarks = React.lazy(
 const Home = React.lazy(() => import('pages/Home/HomeContainer'));
 const TagsContainer = React.lazy(() => import('pages/Tags/TagsContainer'));
 
+const TestMetrics = React.lazy(() => import('pages/TestMetrics'));
+
 export interface IRoute {
   path: PathEnum;
   component:
@@ -82,6 +84,12 @@ const routes = {
     component: RunDetail,
     showInSidebar: false,
     displayName: 'Run Detail',
+  },
+  TEST_METRICS: {
+    path: PathEnum.Test_Metrics,
+    component: TestMetrics,
+    showInSidebar: true,
+    displayName: 'Test Metrics',
   },
 };
 

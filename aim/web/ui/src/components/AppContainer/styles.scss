@@ -1,0 +1,9 @@
+.AppContainer {
+  min-width: 50rem;
+  .AppContentWrapper {
+    height: 100vh;
+    overflow: hidden;
+    .AppContent {}
+  }
+}
+

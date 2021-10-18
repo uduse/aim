@@ -8,6 +8,7 @@ enum PathEnum {
   Tags = '/tags',
   Bookmarks = '/bookmarks',
   Run_Detail = '/runs/:runHash',
+  Test_Metrics = '/test-metrics',
 }
 
 export { PathEnum };
