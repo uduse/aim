@@ -1125,6 +1125,7 @@ function getDataAsTableRows(
         },
         key: metric.key,
         runHash: metric.run.hash,
+        runInProgress: !metric.run?.props?.end_time,
         isHidden: metric.isHidden,
         index: rowIndex,
         color: metricsCollection.color ?? metric.color,

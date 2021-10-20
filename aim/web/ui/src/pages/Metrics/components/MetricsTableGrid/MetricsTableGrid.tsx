@@ -279,12 +279,15 @@ function metricsTableRowRenderer(
       experiment: rowData.experiment,
       run: {
         content: (
-          <Link
-            to={PathEnum.Run_Detail.replace(':runHash', rowData.runHash)}
-            component={RouteLink}
-          >
-            {rowData.run}
-          </Link>
+          <>
+            <Link
+              to={PathEnum.Run_Detail.replace(':runHash', rowData.runHash)}
+              component={RouteLink}
+            >
+              {rowData.run}
+            </Link>
+            {rowData.runInProgress && <span>in progress</span>}
+          </>
         ),
       },
       metric: rowData.metric,

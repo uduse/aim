@@ -3,6 +3,8 @@ export interface IRun<T> {
   props: {
     experiment: string | null;
     name: string;
+    end_time?: number;
+    creation_time: number;
   };
   created_at: number;
   traces: T[];

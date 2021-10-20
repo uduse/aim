@@ -212,6 +212,7 @@ export interface IMetricTableRowData {
   color: metric.color;
   experiment: metric.run.experiment_name;
   run: metric.run.name;
+  runInProgress: boolean;
   metric: metric.metric_name;
   context: string[];
   value: string;
