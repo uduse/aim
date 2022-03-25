@@ -3,7 +3,7 @@ import struct
 from typing import Iterable, Iterator, List, Tuple, Union, Optional
 from typing import TYPE_CHECKING
 
-from aim.web.api.runs.utils import IndexRange, get_run_props
+from aim.web.api.runs.utils import IndexRange, get_run_props, run_params_skip_system
 from aim.sdk.uri_service import URIService, generate_resource_path
 from aim.sdk.sequence_collection import SequenceCollection
 from aim.sdk.sequence import Sequence
@@ -72,8 +72,12 @@ class CustomObjectApi:
                 continue
             self.requested_traces.append(trace)
 
-    def set_ranges(self, record_range: IndexRange, record_density: int,
-                   index_range: Optional[IndexRange] = None, index_density: Optional[int] = None):
+    def set_ranges(self,
+                   record_range: IndexRange,
+                   record_density: int,
+                   index_range: Optional[IndexRange] = None,
+                   index_density: Optional[int] = None,
+                   record_step: Optional[int] = None):
         self.record_range = record_range
         self.record_density = record_density
 
@@ -86,10 +90,20 @@ class CustomObjectApi:
         else:
             self.total_record_range = self._calculate_ranges()
 
+        if record_step is not None:
+            if record_step < 0:
+                record_step += self.total_record_range.stop
+            assert record_step < self.total_record_range.stop
+
+            self.record_range = IndexRange(record_step, record_step + 1)
+
         self._adjust_ranges()
         if self.use_list:
             step = (self.index_range.stop - self.index_range.start) // index_density or 1
             self.index_slice = slice(self.index_range.start, self.index_range.stop, step)
+
+    def get_total_record_range(self):
+        return self._calculate_ranges()
 
     async def search_result_streamer(self):
 
@@ -104,7 +118,7 @@ class CustomObjectApi:
             run_dict = {
                 run_.hash: {
                     'ranges': ranges,
-                    'params': run_.get(..., resolve_objects=True),
+                    'params': run_params_skip_system(run_),
                     'traces': traces_,
                     'props': get_run_props(run_)
                 }

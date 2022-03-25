@@ -105,8 +105,10 @@ def collect_x_axis_data(x_trace: Metric, iters: np.ndarray) -> Tuple[Optional[di
     if not x_axis_iters:
         return None, None
 
-    return numpy_to_encodable(np.array(x_axis_iters, dtype='float64')),\
+    return (
+        numpy_to_encodable(np.array(x_axis_iters, dtype='float64')),
         numpy_to_encodable(np.array(x_axis_values, dtype='float64'))
+    )
 
 
 def collect_run_streamable_data(encoded_tree: Iterator[Tuple[bytes, bytes]]) -> bytes:
@@ -179,7 +181,7 @@ async def metric_search_result_streamer(traces: SequenceCollection,
         if run:
             run_dict = {
                 run.hash: {
-                    'params': run.get(..., resolve_objects=True),
+                    'params': run_params_skip_system(run),
                     'traces': traces_list,
                     'props': get_run_props(run)
                 }
@@ -195,7 +197,7 @@ def run_search_result_streamer(runs: SequenceCollection, limit: int) -> bytes:
         run = run_trace_collection.run
         run_dict = {
             run.hash: {
-                'params': run.get(..., resolve_objects=True),
+                'params': run_params_skip_system(run),
                 'traces': run.collect_sequence_info(sequence_types='metric'),
                 'props': get_run_props(run)
             }
@@ -254,10 +256,12 @@ def checked_query(q: str):
         syntax_error_check(query)
     except SyntaxError as se:
         raise HTTPException(status_code=400, detail={
-            'name': 'SyntaxError',
-            'statement': se.text,
-            'line': se.lineno,
-            'offset': se.offset
+            'message': 'SyntaxError',
+            'detail': {
+                'Statement': se.text,
+                'Line': se.lineno,
+                'Offset': se.offset
+            }
         })
     return query
 
@@ -268,3 +272,11 @@ def checked_range(range_: str = ''):
     except ValueError:
         raise HTTPException(status_code=400, detail='Invalid range format')
     return range_
+
+
+# TODO [AT] remove this method and add proper handling on a storage side (allow skip read by mask)
+def run_params_skip_system(run: Run):
+    props = run.get(..., resolve_objects=True)
+    if '__system_params' in props:
+        del props['__system_params']
+    return props
