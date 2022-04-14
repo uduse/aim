@@ -65,8 +65,7 @@ const ImageBox = ({
         subscription.unsubscribe();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  });
+  }, [addUriToList, blobData, blob_uri]);
 
   function onImageFullSizeModeButtonClick(e: React.ChangeEvent<any>): void {
     e.stopPropagation();
@@ -82,6 +81,11 @@ const ImageBox = ({
       (additionalProperties.alignmentType !== MediaItemAlignmentEnum.Height
         ? style.width / (data.width / data.height)
         : mediaItemHeight - 10) - 6, // 6px -> 0.375rem gap,
+    containerWidth: style.width - 4,
+    containerHeight:
+      (additionalProperties.alignmentType !== MediaItemAlignmentEnum.Height
+        ? style.width / (data.width / data.height)
+        : mediaItemHeight - 10) - 4,
   };
 
   return (
@@ -116,11 +120,19 @@ const ImageBox = ({
                   alt={data.caption}
                 />
               ) : (
-                <Skeleton
-                  variant='rect'
-                  height={skeletonSize.height}
-                  width={skeletonSize.width}
-                />
+                <div
+                  style={{
+                    height: skeletonSize.containerHeight,
+                    width: skeletonSize.containerWidth,
+                  }}
+                  className='skeletonContainer'
+                >
+                  <Skeleton
+                    variant='rect'
+                    height={skeletonSize.height}
+                    width={skeletonSize.width}
+                  />
+                </div>
               )}
               <Text style={{ maxWidth: style.width }} size={10} weight={400}>
                 {data.caption}
