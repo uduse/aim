@@ -1,3 +1,4 @@
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const WebpackDynamicPublicPathPlugin = require('webpack-dynamic-public-path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
@@ -39,12 +40,12 @@ module.exports = {
     }
 
     // Add external variable for base path support.
+    config.plugins.push(new MonacoWebpackPlugin());
     config.plugins.push(
       new WebpackDynamicPublicPathPlugin({
         externalPublicPath: 'window.externalPublicPath',
       }),
     );
-
     return config;
   },
 };
