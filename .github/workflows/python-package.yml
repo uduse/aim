@@ -147,7 +147,7 @@ jobs:
           arch -${{matrix.arch}} $PYTHON -m build
 
       - name: Publish source dist
-        if: matrix.python-version == '3.10'
+        if: matrix.python-version == '3.10' && matrix.arch == 'arm64'
         run: |
           $PYTHON -m twine upload -u __token__ -p "${PYPI_PASSWORD}" dist/*.tar.gz
 
