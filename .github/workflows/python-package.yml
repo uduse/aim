@@ -148,6 +148,8 @@ jobs:
 
       - name: Publish source dist
         if: matrix.python-version == '3.10' && matrix.arch == 'arm64'
+        env:
+          PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
           $PYTHON -m twine upload --verbose -u __token__ -p "${PYPI_PASSWORD}" dist/*.tar.gz
 
