@@ -129,7 +129,7 @@ jobs:
           - arch: 'arm64'
             python-version: 3.7
 
-    name: Python ${{ matrix.python-version }} on ${{ matrix.os }} build
+    name: Python ${{ matrix.python-version }} for ${{ matrix.arch }} build
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.14
       AIM_DEP_DIR: /tmp/aim_run/${{ github.run_number }}/${{ matrix.arch }}
